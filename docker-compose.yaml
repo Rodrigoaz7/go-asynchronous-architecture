@@ -1,12 +1,5 @@
-# docker-compose up .
 version: '3'
 services:
-  webservergo:
-    build: . #buildando dockerfile para gerar imagem
-    ports:
-      - 8090:8090
-    networks:
-      - elastic
       
   elasticsearch01:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
@@ -30,6 +23,68 @@ services:
     networks:
       - elastic
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
+    # volumes:
+    #     - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+    #     - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+        - rabbitmq_go_net
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LISTENERS: INTERNAL://:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT
+
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:6.0.1
+    hostname: control-center
+    depends_on:
+      - kafka
+    ports:
+      - "9021:9021"
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'kafka:9092'
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      PORT: 9021
+
+  publisher:
+    build: ./publisher 
+    ports:
+      - 8090:8090
+    networks:
+      - elastic
+      - rabbitmq_go_net
+
+  consumer:
+    build: ./consumer
+    ports:
+      - 8080:8080
+    networks:
+      - elastic
+      - rabbitmq_go_net
+
 networks:
   elastic:
+    driver: bridge
+  rabbitmq_go_net:
     driver: bridge

@@ -1,22 +1,17 @@
 package enderecoController
 
 import (
-	"context"
 	"encoding/json"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"net/http"
-	"strconv"
-	"strings"
-	"time"
 
-	"github.com/elastic/go-elasticsearch/esapi"
+	"api-go-elasticsearch/publisher/config"
+	rabbitmq "api-go-elasticsearch/publisher/messages/rabbitmq"
+	enderecoModel "api-go-elasticsearch/publisher/models/endereco"
 
 	elasticSearchInstance "github.com/elastic/go-elasticsearch/v7"
 	"github.com/mitchellh/mapstructure"
-	"github.com/rodrigoaz7/api-go-elasticsearch/config"
-	enderecoModel "github.com/rodrigoaz7/api-go-elasticsearch/models/endereco"
 )
 
 const INDEX_NAME = "address"
@@ -27,13 +22,20 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	var queryResponse map[string]interface{}
 	json.NewDecoder(result.Body).Decode(&queryResponse)
 
-	var addressesResponse []enderecoModel.Endereco
-	var addressReference enderecoModel.Endereco
+	var addressesResponse []enderecoModel.Message
+	var addressReference enderecoModel.Message
 
-	for _, hit := range queryResponse["hits"].(map[string]interface{})["hits"].([]interface{}) {
-		craft := hit.(map[string]interface{})["_source"]
-		mapstructure.Decode(craft, &addressReference)
-		addressesResponse = append(addressesResponse, addressReference)
+	quantRegisters := queryResponse["hits"].(map[string]interface{})["total"].(map[string]interface{})["value"].(float64)
+
+	if quantRegisters > 0 {
+		for _, hit := range queryResponse["hits"].(map[string]interface{})["hits"].([]interface{}) {
+			craft := hit.(map[string]interface{})["_source"]
+			messageSoftwareInfo := craft.(map[string]interface{})["message_software"].(string)
+			// this library cannot decode nested data, so was necessary to catch the message_software info above
+			mapstructure.Decode(craft, &addressReference)
+			addressReference.MessageSoftware = messageSoftwareInfo
+			addressesResponse = append(addressesResponse, addressReference)
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -44,10 +46,10 @@ func Get(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Create(w http.ResponseWriter, r *http.Request) {
+func SendMessage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	body := getBody(r)
-	newAddress, err := generateAddress(body)
+	addressData, err := generateAddress(body)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422)
@@ -56,17 +58,26 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	connection := getElasticSearchConnection()
+	var output = []enderecoModel.Message{
+		{
+			Data:            addressData,
+			MessageSoftware: "KAFKA",
+		},
+		{
+			Data:            addressData,
+			MessageSoftware: "RABBITMQ",
+		},
+	}
 
-	bodyOutput := generateOutput(&newAddress)
-	randomId := generateRandomDocumentId()
-
-	request := esapi.IndexRequest{Index: INDEX_NAME, DocumentID: randomId, Body: strings.NewReader(string(bodyOutput))}
-	res, _ := request.Do(context.Background(), connection)
-	defer res.Body.Close()
+	dataToSend, _ := json.Marshal(output[1])
+	err = rabbitmq.PublishMessage(dataToSend)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusCreated)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusCreated)
+	}
 
 }
 
@@ -104,7 +115,9 @@ func generateOutput(addressModel *enderecoModel.Endereco) string {
 	return string(output)
 }
 
-func generateRandomDocumentId() string {
-	rand.Seed(time.Now().UnixNano())
-	return strconv.Itoa(rand.Intn(999999999))
+// Here we set the way error messages are displayed in the terminal.
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s: %s", msg, err)
+	}
 }
