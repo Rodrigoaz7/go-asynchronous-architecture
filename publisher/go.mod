@@ -8,4 +8,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.3
 )
 
-require github.com/streadway/amqp v1.0.0 // indirect
+require (
+	github.com/confluentinc/confluent-kafka-go v1.8.2
+	github.com/streadway/amqp v1.0.0
+)

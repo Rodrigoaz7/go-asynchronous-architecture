@@ -5,30 +5,28 @@
 package main
 
 import (
-	"log"
-
 	config "api-go-elasticsearch/consumer/config"
-	controller "api-go-elasticsearch/consumer/controllers/endereco"
-	rabbitmq "api-go-elasticsearch/consumer/messages/rabbitmq"
+	kafka "api-go-elasticsearch/consumer/messages/kafka"
 )
 
 func main() {
 	config.Init()
+	kafka.ListenMessages()
 
-	msgs, err := rabbitmq.Connect()
-	if err != nil {
-		panic(err)
-	}
+	// msgs, err := rabbitmq.Connect()
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	forever := make(chan bool)
+	// forever := make(chan bool)
 
-	go func() {
-		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
-			controller.Create(d.Body)
-		}
-	}()
+	// go func() {
+	// 	for d := range msgs {
+	// 		log.Printf("Received a message: %s", d.Body)
+	// 		controller.Create(d.Body)
+	// 	}
+	// }()
 
-	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
-	<-forever
+	// log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
+	// <-forever
 }

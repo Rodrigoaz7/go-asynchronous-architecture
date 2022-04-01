@@ -1,11 +1,11 @@
 FROM golang:1.17
 
-RUN mkdir src/consumer
-WORKDIR /src/consumer
+RUN mkdir src/mailService
+WORKDIR /src/mailService
 COPY . .
 
 RUN go mod tidy && go build main.go
 
-EXPOSE 8080
+EXPOSE 8070
 
 ENTRYPOINT ["./main"]

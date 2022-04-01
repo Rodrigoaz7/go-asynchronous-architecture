@@ -11,7 +11,7 @@ import (
 	"os"
 
 	config "api-go-elasticsearch/publisher/config"
-	enderecoController "api-go-elasticsearch/publisher/controllers/endereco"
+	controller "api-go-elasticsearch/publisher/controllers/pix"
 
 	"github.com/gorilla/mux"
 )
@@ -19,9 +19,9 @@ import (
 func main() {
 	config.Init()
 	routes := mux.NewRouter().StrictSlash(true)
-	routes.HandleFunc("/", enderecoController.Get).Methods("GET")
-	routes.HandleFunc("/", enderecoController.SendMessage).Methods("POST")
-	port := os.Getenv("LOCAL_PORT")
+	routes.HandleFunc("/", controller.Get).Methods("GET")
+	routes.HandleFunc("/", controller.SendMessage).Methods("POST")
+	port := os.Getenv("LOCAL_PUBLISHER_PORT")
 	fmt.Println("Server running in port:", port)
 	log.Fatal(http.ListenAndServe(port, routes))
 }
