@@ -11,7 +11,7 @@ import (
 	model "api-go-elasticsearch/mailService/models/pix"
 )
 
-func SendMail(message []byte) {
+func SendMail(message []byte) error {
 
 	messageData := getFormattedData(message)
 	// Sender data.
@@ -54,9 +54,10 @@ func SendMail(message []byte) {
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, body.Bytes())
 	if err != nil {
 		fmt.Println(err)
-		return
+		return err
 	}
 	fmt.Println("Email Sent!")
+	return nil
 }
 
 func getFormattedData(data []byte) model.PixTransaction {

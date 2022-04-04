@@ -3,17 +3,13 @@ package enderecoController
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"time"
 
-	connectionElasticSearch "api-go-elasticsearch/publisher/elasticsearch"
 	kafka "api-go-elasticsearch/publisher/messages"
 	model "api-go-elasticsearch/publisher/models/pix"
 	"api-go-elasticsearch/publisher/service"
-
-	elasticSearchInstance "github.com/elastic/go-elasticsearch/v7"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -76,13 +72,4 @@ func generateTransaction(body []byte) (model.PixTransaction, error) {
 	currentTime := time.Now()
 	newPixTransaction.TransactionTime = currentTime.Format("2006-01-02 15:04:05")
 	return newPixTransaction, err
-}
-
-func getElasticSearchConnection() *elasticSearchInstance.Client {
-	elasticInstance, err := connectionElasticSearch.ConnectElasticSearch()
-	if err != nil {
-		log.Fatalf("Error connecting to elasticsearch: %s", err)
-		panic(err)
-	}
-	return elasticInstance
 }
