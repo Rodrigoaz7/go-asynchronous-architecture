@@ -126,6 +126,8 @@ services:
   #   networks:
   #     - elastic
   #     - rabbitmq_go_net
+  #   extra_hosts:
+  #     - "host.docker.internal:172.17.0.1"
 
   # consumer:
   #   build: ./consumer
@@ -133,6 +135,15 @@ services:
   #     - 8080:8080
   #   networks:
   #     - elastic
+  #     - rabbitmq_go_net
+  #   extra_hosts:
+  #     - "host.docker.internal:172.17.0.1"
+
+  # mailservice:
+  #   build: ./mailService
+  #   ports:
+  #     - 8070:8070
+  #   networks:
   #     - rabbitmq_go_net
 
 networks:

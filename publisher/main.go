@@ -20,7 +20,7 @@ func main() {
 	config.Init()
 	routes := mux.NewRouter().StrictSlash(true)
 	routes.HandleFunc("/", controller.Get).Methods("GET")
-	routes.HandleFunc("/", controller.SendMessage).Methods("POST")
+	routes.HandleFunc("/", controller.Post).Methods("POST")
 	port := os.Getenv("LOCAL_PUBLISHER_PORT")
 	fmt.Println("Server running in port:", port)
 	log.Fatal(http.ListenAndServe(port, routes))

@@ -28,8 +28,6 @@ func SendMail(message []byte) {
 	smtpHost := os.Getenv("MAIL_HOST")
 	smtpPort := os.Getenv("MAIL_PORT")
 
-	fmt.Println(from, password, smtpHost, smtpPort)
-
 	// Authentication.
 	auth := smtp.PlainAuth("", from, password, smtpHost)
 
