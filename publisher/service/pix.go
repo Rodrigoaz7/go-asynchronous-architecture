@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/url"
 
-	connectionElasticSearch "api-go-elasticsearch/publisher/elasticsearch"
-	model "api-go-elasticsearch/publisher/models/pix"
+	connectionElasticSearch "go-asynchronous-architecture/publisher/elasticsearch"
+	model "go-asynchronous-architecture/publisher/models/pix"
 
 	elasticSearchInstance "github.com/elastic/go-elasticsearch/v7"
 	"github.com/mitchellh/mapstructure"

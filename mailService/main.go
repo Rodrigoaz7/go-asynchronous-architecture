@@ -5,8 +5,8 @@
 package main
 
 import (
-	config "api-go-elasticsearch/mailService/config"
-	mail "api-go-elasticsearch/mailService/mail"
+	config "go-asynchronous-architecture/mailService/config"
+	mail "go-asynchronous-architecture/mailService/mail"
 	"log"
 	"os"
 
@@ -16,9 +16,16 @@ import (
 func main() {
 	config.Init()
 	var rabbitmqUrl = os.Getenv("RABBITMQ_SERVER")
-	conn, _ := amqp.Dial(rabbitmqUrl)
+	conn, err := amqp.Dial(rabbitmqUrl)
+	if err != nil {
+		log.Fatalf("Error connecting to rabbitmq: '%s'", err)
+	}
 	defer conn.Close()
-	ch, _ := conn.Channel()
+
+	ch, err := conn.Channel()
+	if err != nil {
+		log.Fatalf("Error creating channel rabbitmq: '%s'", err)
+	}
 	defer ch.Close()
 
 	var rabbitmqQueue = os.Getenv("RABBITMQ_QUEUE_NAME")

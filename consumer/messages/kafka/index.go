@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	controller "api-go-elasticsearch/consumer/controllers/pix"
-	rabbitmq "api-go-elasticsearch/consumer/messages/rabbitmq"
+	controller "go-asynchronous-architecture/consumer/controllers/pix"
+	rabbitmq "go-asynchronous-architecture/consumer/messages/rabbitmq"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
@@ -14,9 +14,11 @@ func ListenMessages() {
 	var kafkaServer string = os.Getenv("KAFKA_BOOTSTRAP_SERVER")
 	var kafkaGroupId string = os.Getenv("KAFKA_GROUP_ID")
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": kafkaServer,
-		"group.id":          kafkaGroupId,
-		"auto.offset.reset": "earliest",
+		"bootstrap.servers":     kafkaServer,
+		"group.id":              kafkaGroupId,
+		"auto.offset.reset":     "earliest",
+		"broker.address.family": "v4",
+		"session.timeout.ms":    6000,
 	})
 
 	if err != nil {

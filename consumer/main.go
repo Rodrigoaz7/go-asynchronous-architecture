@@ -5,28 +5,11 @@
 package main
 
 import (
-	config "api-go-elasticsearch/consumer/config"
-	kafka "api-go-elasticsearch/consumer/messages/kafka"
+	config "go-asynchronous-architecture/consumer/config"
+	kafka "go-asynchronous-architecture/consumer/messages/kafka"
 )
 
 func main() {
 	config.Init()
 	kafka.ListenMessages()
-
-	// msgs, err := rabbitmq.Connect()
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// forever := make(chan bool)
-
-	// go func() {
-	// 	for d := range msgs {
-	// 		log.Printf("Received a message: %s", d.Body)
-	// 		controller.Create(d.Body)
-	// 	}
-	// }()
-
-	// log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
-	// <-forever
 }

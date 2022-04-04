@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	config "api-go-elasticsearch/consumer/elasticsearch"
-	model "api-go-elasticsearch/consumer/models/pix"
+	config "go-asynchronous-architecture/consumer/elasticsearch"
+	model "go-asynchronous-architecture/consumer/models/pix"
 
 	"github.com/elastic/go-elasticsearch/esapi"
 	elasticSearchInstance "github.com/elastic/go-elasticsearch/v7"

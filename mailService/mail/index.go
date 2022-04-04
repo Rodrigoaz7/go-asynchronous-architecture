@@ -8,7 +8,7 @@ import (
 	"os"
 	"text/template"
 
-	model "api-go-elasticsearch/mailService/models/pix"
+	model "go-asynchronous-architecture/mailService/models/pix"
 )
 
 func SendMail(message []byte) error {

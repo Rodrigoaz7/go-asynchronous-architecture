@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"os"
 
-	model "api-go-elasticsearch/consumer/models/pix"
-	service "api-go-elasticsearch/consumer/service"
+	model "go-asynchronous-architecture/consumer/models/pix"
+	service "go-asynchronous-architecture/consumer/service"
 )
 
 func PersistData(data []byte) error {

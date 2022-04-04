@@ -2,12 +2,21 @@ package elasticsearch
 
 import (
 	"log"
+	"os"
 
 	elasticsearch "github.com/elastic/go-elasticsearch/v7"
 )
 
 func ConnectElasticSearch() (*elasticsearch.Client, error) {
-	es, err := elasticsearch.NewDefaultClient()
+	elasticsearchHost := os.Getenv("ELASTICSEARCH_HOST")
+	elasticsearchPort := os.Getenv("ELASTICSEARCH_PORT")
+	elasticsearchUrl := elasticsearchHost + elasticsearchPort
+	cfg := elasticsearch.Config{
+		Addresses: []string{
+			elasticsearchUrl,
+		},
+	}
+	es, err := elasticsearch.NewClient(cfg)
 	if err != nil {
 		log.Fatalf("Error creating the client: %s", err)
 		return nil, err

@@ -1,4 +1,4 @@
-module api-go-elasticsearch/consumer
+module go-asynchronous-architecture/consumer
 
 go 1.17
 

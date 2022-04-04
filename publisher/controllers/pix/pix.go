@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
-	kafka "api-go-elasticsearch/publisher/messages"
-	model "api-go-elasticsearch/publisher/models/pix"
-	"api-go-elasticsearch/publisher/service"
+	kafka "go-asynchronous-architecture/publisher/messages"
+	model "go-asynchronous-architecture/publisher/models/pix"
+	"go-asynchronous-architecture/publisher/service"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {

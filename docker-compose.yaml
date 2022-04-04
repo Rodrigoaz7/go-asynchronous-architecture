@@ -119,32 +119,36 @@ services:
       CONTROL_CENTER_CONNECT_CLUSTER: http://kafka-connect:8083
       PORT: 9021
 
-  # publisher:
-  #   build: ./publisher 
-  #   ports:
-  #     - 8090:8090
-  #   networks:
-  #     - elastic
-  #     - rabbitmq_go_net
-  #   extra_hosts:
-  #     - "host.docker.internal:172.17.0.1"
+  publisher:
+    build: ./publisher 
+    ports:
+      - 8090:8090
+    networks:
+      - elastic
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    restart: on-failure
 
-  # consumer:
-  #   build: ./consumer
-  #   ports:
-  #     - 8080:8080
-  #   networks:
-  #     - elastic
-  #     - rabbitmq_go_net
-  #   extra_hosts:
-  #     - "host.docker.internal:172.17.0.1"
+  consumer:
+    build: ./consumer
+    ports:
+      - 8080:8080
+    networks:
+      - elastic
+      - rabbitmq_go_net
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    restart: on-failure
 
-  # mailservice:
-  #   build: ./mailService
-  #   ports:
-  #     - 8070:8070
-  #   networks:
-  #     - rabbitmq_go_net
+  mailservice:
+    build: ./mailService
+    ports:
+      - 8070:8070
+    networks:
+      - rabbitmq_go_net
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    restart: on-failure
 
 networks:
   elastic:

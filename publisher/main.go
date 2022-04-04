@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"os"
 
-	config "api-go-elasticsearch/publisher/config"
-	controller "api-go-elasticsearch/publisher/controllers/pix"
+	config "go-asynchronous-architecture/publisher/config"
+	controller "go-asynchronous-architecture/publisher/controllers/pix"
 
 	"github.com/gorilla/mux"
 )

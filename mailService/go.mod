@@ -1,4 +1,4 @@
-module api-go-elasticsearch/mailService
+module go-asynchronous-architecture/mailService
 
 go 1.17
 

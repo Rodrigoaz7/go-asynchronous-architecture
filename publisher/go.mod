@@ -1,4 +1,4 @@
-module api-go-elasticsearch/publisher
+module go-asynchronous-architecture/publisher
 
 go 1.17
 
