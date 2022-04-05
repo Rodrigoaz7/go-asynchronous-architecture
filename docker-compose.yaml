@@ -105,6 +105,15 @@ services:
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
 
+  kafka-topics-generator:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - kafka
+    command: >
+      bash -c
+        "sleep 5s &&
+        kafka-topics --create --topic=pix_transactions --if-not-exists --bootstrap-server=kafka:9092"
+
   control-center:
     image: confluentinc/cp-enterprise-control-center:6.0.1
     hostname: control-center
@@ -119,36 +128,36 @@ services:
       CONTROL_CENTER_CONNECT_CLUSTER: http://kafka-connect:8083
       PORT: 9021
 
-  # publisher:
-  #   build: ./publisher 
-  #   ports:
-  #     - 8090:8090
-  #   networks:
-  #     - elastic
-  #   extra_hosts:
-  #     - "host.docker.internal:172.17.0.1"
-  #   restart: on-failure
+  publisher:
+    build: ./publisher 
+    ports:
+      - 8090:8090
+    networks:
+      - elastic
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    restart: on-failure
 
-  # consumer:
-  #   build: ./consumer
-  #   ports:
-  #     - 8080:8080
-  #   networks:
-  #     - elastic
-  #     - rabbitmq_go_net
-  #   extra_hosts:
-  #     - "host.docker.internal:172.17.0.1"
-  #   restart: on-failure
+  consumer:
+    build: ./consumer
+    ports:
+      - 8080:8080
+    networks:
+      - elastic
+      - rabbitmq_go_net
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    restart: on-failure
 
-  # mailservice:
-  #   build: ./mailService
-  #   ports:
-  #     - 8070:8070
-  #   networks:
-  #     - rabbitmq_go_net
-  #   extra_hosts:
-  #     - "host.docker.internal:172.17.0.1"
-  #   restart: on-failure
+  mailservice:
+    build: ./mailService
+    ports:
+      - 8070:8070
+    networks:
+      - rabbitmq_go_net
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    restart: on-failure
 
 networks:
   elastic:

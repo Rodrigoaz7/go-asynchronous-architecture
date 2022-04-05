@@ -46,7 +46,7 @@ func SendMail(message []byte) error {
 	}{
 		SourceEmail: messageData.SourceMail,
 		TargetEmail: messageData.TargetMail,
-		Date:        messageData.TransactionTime,
+		Date:        messageData.TransactionTime.Format("2006-01-02 15:04:05"),
 		Value:       messageData.Value,
 	})
 

@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/url"
 
@@ -10,7 +11,6 @@ import (
 	model "go-asynchronous-architecture/publisher/models/pix"
 
 	elasticSearchInstance "github.com/elastic/go-elasticsearch/v7"
-	"github.com/mitchellh/mapstructure"
 )
 
 func FindAll(index string, params url.Values) []model.PixTransaction {
@@ -33,7 +33,6 @@ func FindAll(index string, params url.Values) []model.PixTransaction {
 	}
 
 	var dataResponse []model.PixTransaction
-	var pixReference model.PixTransaction
 
 	isExistsIndex := queryResponse["hits"] != nil
 	if !isExistsIndex {
@@ -45,8 +44,11 @@ func FindAll(index string, params url.Values) []model.PixTransaction {
 	if isExistsAnyRegisters {
 		for _, hit := range queryResponse["hits"].(map[string]interface{})["hits"].([]interface{}) {
 			item := hit.(map[string]interface{})["_source"]
-			mapstructure.Decode(item, &pixReference)
-			dataResponse = append(dataResponse, pixReference)
+			pixReference, err := model.NewPixTransactionFromElasticSearch(item)
+			if err == nil {
+				fmt.Println(*pixReference)
+				dataResponse = append(dataResponse, *pixReference)
+			}
 		}
 	}
 

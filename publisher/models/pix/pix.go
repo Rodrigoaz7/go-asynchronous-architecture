@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -46,6 +47,36 @@ func NewPixTransaction(data []byte) (*PixTransaction, error) {
 
 	currentTime := time.Now()
 	newPixTransaction.TransactionTime = currentTime
+
+	errorValidation := newPixTransaction.isValid()
+
+	if errorValidation != nil {
+		return nil, errorValidation
+	}
+
+	return &newPixTransaction, nil
+}
+
+func NewPixTransactionFromElasticSearch(data interface{}) (*PixTransaction, error) {
+
+	transactionTimeString := data.(map[string]interface{})["transaction_time"].(string)
+	layout := "2006-01-02T15:04:05.0000000Z"
+	transactionTime, err := time.Parse(layout, transactionTimeString)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(transactionTime)
+
+	newPixTransaction := PixTransaction{
+		SourceAccount:   data.(map[string]interface{})["source_account"].(string),
+		TargetAccount:   data.(map[string]interface{})["target_account"].(string),
+		SourceMail:      data.(map[string]interface{})["source_mail"].(string),
+		TargetMail:      data.(map[string]interface{})["target_mail"].(string),
+		Value:           data.(map[string]interface{})["value"].(float64),
+		TransactionTime: transactionTime,
+	}
 
 	errorValidation := newPixTransaction.isValid()
 
