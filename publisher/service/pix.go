@@ -17,12 +17,28 @@ func FindAll(index string, params url.Values) []model.PixTransaction {
 	connection := getElasticSearchConnection()
 
 	body := generateSearchBody(params)
-	result, _ := connection.Search(connection.Search.WithIndex(index), connection.Search.WithBody(&body))
+	result, _ := connection.Search(
+		connection.Search.WithIndex(index),
+		connection.Search.WithBody(&body),
+		connection.Search.WithTrackTotalHits(true),
+		connection.Search.WithPretty(),
+	)
+	defer result.Body.Close()
+
 	var queryResponse map[string]interface{}
-	json.NewDecoder(result.Body).Decode(&queryResponse)
+	err := json.NewDecoder(result.Body).Decode(&queryResponse)
+	if err != nil {
+		log.Fatalf("Error parsing the response body: %s", err)
+		return nil
+	}
 
 	var dataResponse []model.PixTransaction
 	var pixReference model.PixTransaction
+
+	isExistsIndex := queryResponse["hits"] != nil
+	if !isExistsIndex {
+		return []model.PixTransaction{}
+	}
 
 	quantRegisters := queryResponse["hits"].(map[string]interface{})["total"].(map[string]interface{})["value"].(float64)
 	isExistsAnyRegisters := quantRegisters > 0

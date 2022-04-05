@@ -35,9 +35,10 @@ func ListenMessages() {
 			errorToPersist := controller.PersistData(msg.Value)
 			if errorToPersist == nil {
 				rabbitmq.PublishNotification(msg.Value)
+			} else {
+				fmt.Printf("Error persisting data to elasticsearch: %v", errorToPersist)
 			}
 		} else {
-			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v (%v)\n", err, msg)
 		}
 	}

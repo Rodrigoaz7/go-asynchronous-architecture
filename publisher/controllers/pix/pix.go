@@ -1,11 +1,10 @@
-package enderecoController
+package controllers
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"time"
 
 	kafka "go-asynchronous-architecture/publisher/messages"
 	model "go-asynchronous-architecture/publisher/models/pix"
@@ -31,23 +30,29 @@ func Get(w http.ResponseWriter, r *http.Request) {
 func Post(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	body := getBody(r)
-	pixData, err := generateTransaction(body)
+	pixData, err := model.NewPixTransaction(body)
+
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusBadRequest)
-		if err := json.NewEncoder(w).Encode(err); err != nil {
+		if err := json.NewEncoder(w).Encode(err.Error()); err != nil {
 			panic(err)
 		}
+		return
 	}
 
-	dataToSend, _ := json.Marshal(pixData)
-	err = kafka.SendMessage(dataToSend)
+	streamData, _ := json.Marshal(*pixData)
+	err = kafka.SendMessage(streamData)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
 		w.WriteHeader(http.StatusCreated)
+	}
+
+	if err := json.NewEncoder(w).Encode(*pixData); err != nil {
+		panic(err)
 	}
 
 }
@@ -64,12 +69,4 @@ func getBody(r *http.Request) []byte {
 	}
 
 	return body
-}
-
-func generateTransaction(body []byte) (model.PixTransaction, error) {
-	var newPixTransaction model.PixTransaction
-	err := json.Unmarshal(body, &newPixTransaction)
-	currentTime := time.Now()
-	newPixTransaction.TransactionTime = currentTime.Format("2006-01-02 15:04:05")
-	return newPixTransaction, err
 }

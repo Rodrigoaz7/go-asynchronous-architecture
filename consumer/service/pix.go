@@ -4,16 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	"math/rand"
-	"strconv"
 	"strings"
-	"time"
 
 	config "go-asynchronous-architecture/consumer/elasticsearch"
 	model "go-asynchronous-architecture/consumer/models/pix"
 
 	"github.com/elastic/go-elasticsearch/esapi"
 	elasticSearchInstance "github.com/elastic/go-elasticsearch/v7"
+	uuid "github.com/satori/go.uuid"
 )
 
 func Create(data model.PixTransaction, index string) error {
@@ -43,6 +41,5 @@ func generateDataToPersist(pixTransaction model.PixTransaction) string {
 }
 
 func generateRandomDocumentId() string {
-	rand.Seed(time.Now().UnixNano())
-	return strconv.Itoa(rand.Intn(999999999))
+	return uuid.NewV4().String()
 }

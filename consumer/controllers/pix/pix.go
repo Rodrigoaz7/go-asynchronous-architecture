@@ -1,7 +1,6 @@
 package enderecoController
 
 import (
-	"encoding/json"
 	"os"
 
 	model "go-asynchronous-architecture/consumer/models/pix"
@@ -9,14 +8,14 @@ import (
 )
 
 func PersistData(data []byte) error {
-	var pixTransaction model.PixTransaction
-	err := json.Unmarshal(data, &pixTransaction)
+	pixTransaction, err := model.NewPixTransaction(data)
+
 	if err != nil {
 		return err
 	}
 
 	index := os.Getenv("ELASTICSEARCH_INDEX_NAME")
-	ok := service.Create(pixTransaction, index)
+	ok := service.Create(*pixTransaction, index)
 	if ok != nil {
 		return ok
 	}
