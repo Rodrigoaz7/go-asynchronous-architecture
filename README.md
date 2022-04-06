@@ -69,11 +69,10 @@ func Init() {
 	os.Setenv("ELASTICSEARCH_HOST", "http://elasticsearch01")
 	os.Setenv("ELASTICSEARCH_PORT", ":9200")
 }
-
+```
 Each service uses some of the variables above, you should use only the ones that the service needs.
 
 Ps: In the Dockerfile files, the images are being exposed to specific ports. You need to adapte that to your local environment variables.
-```
 
 ## Running
 After all docker's conteiners are up, you can init the project accessing by your LOCAL-PUBLISHER-PORT. A HTTP GET requisition will return a json array with all pix transactions registered in elasticsearch database. 
